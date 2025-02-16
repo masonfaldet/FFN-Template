@@ -12,7 +12,7 @@ from torch.utils.data import TensorDataset, DataLoader
 # --------------------------------
 # Task: Learn f(x) = sin(2 pi x) + sin(7 pi x) - cos(5 pi x) + noise.
 # Details: No regularization techniques used. 300 training examples, 200 validation example, 1000 epochs
-# Results: Performance statistics and plots are saved to FF_1DRegression_No_Reg folder in repo.
+# Results: Performance statistics and plots are saved to Regression_Results folder in repo.
 
 if __name__ == '__main__':
     # ------------------------------
