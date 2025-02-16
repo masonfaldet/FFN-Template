@@ -20,11 +20,15 @@ In its current configuration, the model is set up for regression tasks (e.g., le
   - Early Stopping
 
 ## Examples
-The examples below will train in about a minute or less, thus the corresponding results posted are by no means optimized. 
-- **One-Dimensional Regression Task:**
-  A ready to run simple regression task is implemented in Example_Regression_Task.py. This example has detailed comments outlining the options avalible to the user. Results from this simple experiment can be found in Regression_Results folder.
-- **MNIST Classification Probem:**
-  A ready to run instance of Flexible_FFN_Template to classify the MNIST dataset can be found in Example_MNIST_Classification.py. This implementation has less detailed comments, so I recommend looking at the one-dimensional regression example first. Results from this MNIST run can be found in the MNIST_Result folder.
+
+The following examples demonstrate how to run experiments quickly (in about a minute or less). Note that the posted results are not optimized.
+
+- **One-Dimensional Regression Task:**  
+  The `Example_Regression_Task.py` script implements a simple regression task with detailed comments that explain all available options. You can find the results in the `Regression_Results` folder.
+
+- **MNIST Classification Problem:**  
+  The `Example_MNIST_Classification.py` script uses a flexible feed-forward network template to classify the MNIST dataset. Although the comments are less detailed in this example, it is recommended to review the regression task example first. Results from this experiment are stored in the `MNIST_Results` folder.
+
   
 
 ## Installation
