@@ -1,0 +1,8 @@
+Performance Statistics
+=======================
+Total epochs: 15000
+Final Training Loss: 0.483200
+Final Validation Loss: 0.389385
+Best Validation Loss: 0.315188
+Expected Error on Validation Set (Mean Absolute Error): 0.485062
+Error Variance on Validation Set: 0.386594
