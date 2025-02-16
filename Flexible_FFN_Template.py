@@ -3,9 +3,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 
-# ------------------------------
+# ------------------------------------------------------------------------------
 # Define a Flexible Feedforward Neural Network with Optional Layer Normalization
-# ------------------------------
+# ------------------------------------------------------------------------------
 class FlexibleMLP(nn.Module):
     def __init__(self, depth, widths, input_size=1, output_size=1, dropout=0.0, layer_norm=False):
         """
@@ -53,11 +53,11 @@ class FlexibleMLP(nn.Module):
         return self.model(x)
 
 
-# ------------------------------
+# ----------------------------------------------------------------
 # Define a Training Function with Early Stopping and Loss Tracking
-# ------------------------------
+# ----------------------------------------------------------------
 def train(model, criterion, optimizer, dataloader,
-          x_val=None, y_val=None, epochs=500, l1_reg=0.0, l2_reg=0.0,
+          val_dataloader=None, epochs=500, l1_reg=0.0, l2_reg=0.0,
           early_stopping_patience=0):
     """
     Trains the model with options for L1/L2 regularization and early stopping.
@@ -67,9 +67,8 @@ def train(model, criterion, optimizer, dataloader,
         model (nn.Module): The neural network model.
         criterion (loss function): e.g., nn.MSELoss()
         optimizer (torch.optim.Optimizer): Optimizer for updating model parameters.
-        dataloader (DataLoader): Loader for mini-batches.
-        x_val (Tensor): Validation inputs (optional for early stopping).
-        y_val (Tensor): Validation targets.
+        dataloader (DataLoader): Loader for mini-batches of training data.
+        val_dataloader (DataLoader): Loader for mini-batches of validation data (optional for early stopping).
         epochs (int): Maximum number of epochs.
         l1_reg (float): L1 regularization strength.
         l2_reg (float): L2 regularization strength.
@@ -86,10 +85,10 @@ def train(model, criterion, optimizer, dataloader,
     epochs_without_improvement = 0
 
     for epoch in range(epochs):
-        model.train()  # Ensure model is in training mode (enable dropout)
+        model.train()  # Enable training mode (e.g., for dropout)
         epoch_loss = 0.0
 
-        # Process the (full) batch
+        # Iterate over training batches
         for batch_x, batch_y in dataloader:
             optimizer.zero_grad()  # Reset gradients
 
@@ -110,37 +109,44 @@ def train(model, criterion, optimizer, dataloader,
                     l2_loss += torch.sum(param ** 2)
                 loss += l2_reg * l2_loss
 
-            # loss.backward() uses PyTorch's automatic differentiation system autograd to compute
-            # the gradient of the entire loss. Autograd automatically includes additional
-            # regularization terms like L1/L2 loss in addition to the primary loss provided by criterion
-            loss.backward()
+            loss.backward()  # Compute gradients
             optimizer.step()  # Update parameters
+
             epoch_loss += loss.item()
 
-        # Average loss for this epoch
+        # Average training loss for this epoch
         epoch_loss /= len(dataloader)
         train_losses.append(epoch_loss)
 
-        # Check validation loss if validation data is provided
-        if x_val is not None and y_val is not None:
-            model.eval()  # Switch to evaluation mode (disables dropout)
-            with torch.no_grad():
-                val_predictions = model(x_val)
-                val_loss = criterion(val_predictions, y_val).item()
-                val_losses.append(val_loss)
+        # Process validation data if a validation dataloader is provided
+        if val_dataloader is not None:
+            model.eval()  # Switch to evaluation mode
+            val_loss_total = 0.0
+            n_val_batches = 0
 
-            # Early stopping logic based on validation loss
+            with torch.no_grad():
+                for val_batch_x, val_batch_y in val_dataloader:
+                    val_predictions = model(val_batch_x)
+                    batch_loss = criterion(val_predictions, val_batch_y)
+                    val_loss_total += batch_loss.item()
+                    n_val_batches += 1
+
+            avg_val_loss = val_loss_total / n_val_batches
+            val_losses.append(avg_val_loss)
+
+            # Early stopping based on validation loss
             if early_stopping_patience > 0:
-                if val_loss < best_val_loss:
-                    best_val_loss = val_loss
+                if avg_val_loss < best_val_loss:
+                    best_val_loss = avg_val_loss
                     epochs_without_improvement = 0
                 else:
                     epochs_without_improvement += 1
 
                 if epochs_without_improvement >= early_stopping_patience:
+                    print(f"Early stopping at epoch {epoch+1}")
                     break
         else:
-            # If no validation set is provided, just log training loss
+            # If no validation dataloader is provided, append None for consistency
             val_losses.append(None)
 
     return train_losses, val_losses

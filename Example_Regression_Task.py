@@ -7,9 +7,14 @@ import os
 from Flexible_FFN_Template import FlexibleMLP, train
 from torch.utils.data import TensorDataset, DataLoader
 
+# --------------------------------
+# Example Usage
+# --------------------------------
+# Task: Learn f(x) = sin(2 pi x) + sin(7 pi x) - cos(5 pi x) + noise.
+# Details: No regularization techniques used. 300 training examples, 200 validation example, 1000 epochs
+# Results: Performance statistics and plots are saved to FF_1DRegression_No_Reg folder in repo.
 
 if __name__ == '__main__':
-    #-------------------------------
     # ------------------------------
     # Data Generation and Preparation
     # ------------------------------
@@ -26,7 +31,7 @@ if __name__ == '__main__':
     x_all = x_all[indices]
     y_all = y_all[indices]
 
-    # Split into training and validation sets (80% training, 20% validation)
+    # Split into training and validation sets (60% training, 40% validation)
     val_split = int(0.6 * len(x_all))
     x_train = x_all[:val_split]
     y_train = y_all[:val_split]
@@ -34,8 +39,10 @@ if __name__ == '__main__':
     y_val = y_all[val_split:]
 
     # Use DataLoader to enable mini-batching (set batch_size = len(x_train) for full batch training)
-    dataset = TensorDataset(x_train, y_train)
-    dataloader = DataLoader(dataset, batch_size=100, shuffle=True)
+    train_dataset = TensorDataset(x_train, y_train)
+    train_dataloader = DataLoader(train_dataset, batch_size=100, shuffle=True)
+    val_dataset = TensorDataset(x_val, y_val)
+    val_dataloader = DataLoader(val_dataset, batch_size=20, shuffle=False)
 
 
     # ------------------------------
@@ -88,8 +95,8 @@ if __name__ == '__main__':
     # (Optional) Validation set (required for early stopping regularization)
     # (Optional) L1 and/or L2 weight decay regularization.
     # (Optional) Early stopping regularization (set early_stopping_patience = 0 to disable)
-    train_losses, val_losses = train(model, criterion, optimizer, dataloader,
-                                     x_val=x_val, y_val=y_val, epochs=10000,
+    train_losses, val_losses = train(model, criterion, optimizer, train_dataloader,
+                                     val_dataloader, epochs=10000,
                                      l1_reg=0, l2_reg=0, early_stopping_patience=0)
 
     # ------------------------------

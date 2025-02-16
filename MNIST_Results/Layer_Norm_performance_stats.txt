@@ -1,0 +1,9 @@
+Performance Statistics:
+-----------------------
+Total Test Samples: 10000
+Accuracy: 97.87%
+Error Rate: 2.13%
+Average Confidence: 99.27%
+
+Final Training Loss: 0.013682579144456971
+Final Validation Loss: 0.1047849624913571
