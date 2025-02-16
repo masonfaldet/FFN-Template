@@ -21,7 +21,7 @@ In its current configuration, the model is set up for regression tasks (e.g., le
 
 ## Examples
 
-The following examples demonstrate how to run experiments quickly (in about a minute or less). Note that the posted results are not optimized.
+The following examples demonstrate how to run experiments quickly (in about a minute or less). Consequently, the posted results are not optimized.
 
 - **One-Dimensional Regression Task:**  
   The `Example_Regression_Task.py` uses the template in  `Flexible_FFN_Template.py` to solve a simple regression task with detailed comments that explain all available options. You can find the results in the `Regression_Results` folder.
