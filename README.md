@@ -23,7 +23,7 @@ In its current configuration, the model is set up for regression tasks (e.g., le
 The examples below will train in about a minute or less, thus the corresponding results posted are by no means optimized. 
 - **One-Dimensional Regression Task**
   A ready to run simple regression task is implemented in Example_Regression_Task.py. This example has detailed comments outlining the options avalible to the user. Results from this simple experiment can be found in Example_Regression_Results folder.
--**MNIST Classification Probem**
+- **MNIST Classification Probem**
   A ready to run instance of Flexible_FFN_Template to classify the MNIST dataset can be found in Example_MNIST_Classification.py. This implementation has less detailed comments, so I recommend looking at the one-dimensional regression example first. Results from this MNIST run can be found in the MNIST_Result folder.
   
 
