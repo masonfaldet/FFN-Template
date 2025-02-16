@@ -24,7 +24,7 @@ In its current configuration, the model is set up for regression tasks (e.g., le
 The following examples demonstrate how to run experiments quickly (in about a minute or less). Consequently, the posted results are not optimized.
 
 - **One-Dimensional Regression Task:**  
-  The `Example_Regression_Task.py` uses the template in  `Flexible_FFN_Template.py` to solve a simple regression task with detailed comments that explain all available options. You can find the results in the `Regression_Results` folder.
+  The `Example_Regression_Task.py` uses the template in  `Flexible_FFN_Template.py` to solve a simple regression task with detailed comments that explain all available features. You can find the results in the `Regression_Results` folder.
 
 - **MNIST Classification Problem:**  
   The `Example_MNIST_Classification.py` script uses the template in  `Flexible_FFN_Template.py` to classify the MNIST dataset. Because the comments are less detailed in this example, it is recommended to review the regression task example first. Results from this experiment are stored in the `MNIST_Results` folder.
