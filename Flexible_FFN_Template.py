@@ -1,9 +1,7 @@
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import numpy as np
-import matplotlib.pyplot as plt
-from torch.utils.data import TensorDataset, DataLoader
+from torch.utils.data import DataLoader
+
 
 # ------------------------------
 # Define a Flexible Feedforward Neural Network with Optional Layer Normalization
@@ -121,8 +119,7 @@ def train(model, criterion, optimizer, dataloader,
 
         # Average loss for this epoch
         epoch_loss /= len(dataloader)
-        if epoch % 50 == 0:
-            train_losses.append(epoch_loss)
+        train_losses.append(epoch_loss)
 
         # Check validation loss if validation data is provided
         if x_val is not None and y_val is not None:
@@ -130,7 +127,6 @@ def train(model, criterion, optimizer, dataloader,
             with torch.no_grad():
                 val_predictions = model(x_val)
                 val_loss = criterion(val_predictions, y_val).item()
-            if epoch % 50 == 0:
                 val_losses.append(val_loss)
 
             # Early stopping logic based on validation loss
@@ -149,138 +145,5 @@ def train(model, criterion, optimizer, dataloader,
 
     return train_losses, val_losses
 
-if __name__ == '__main__':
 
-    #       Example Usage
-    #-------------------------------
-    # ------------------------------
-    # Data Generation and Preparation
-    # ------------------------------
-    np.random.seed(42)
-    x = np.linspace(-2, 2, 500).reshape(-1, 1)
-    y = np.sin(np.pi * x) + 0.1 * np.random.randn(500, 1)
-
-    x_all = torch.tensor(x, dtype=torch.float32)
-    y_all = torch.tensor(y, dtype=torch.float32)
-
-    # Shuffle the data before splitting. This ensures validation is randomly distributed across training data
-    torch.manual_seed(42)
-    indices = torch.randperm(x_all.size(0))
-    x_all = x_all[indices]
-    y_all = y_all[indices]
-
-    # Split into training and validation sets (80% training, 20% validation)
-    val_split = int(0.8 * len(x_all))
-    x_train = x_all[:val_split]
-    y_train = y_all[:val_split]
-    x_val = x_all[val_split:]
-    y_val = y_all[val_split:]
-
-    # Use DataLoader to enable mini-batching (set batch_size = len(x_train) for full batch training)
-    dataset = TensorDataset(x_train, y_train)
-    dataloader = DataLoader(dataset, batch_size=100, shuffle=True)
-
-
-    # ------------------------------
-    # Model, Loss Function, and Optimizer Setup
-    # ------------------------------
-
-    # Create FlexibleMLP instance.
-    # Provide number of input and output features in addition to depth and width of network
-    # Optional: dropout regularization (dropout = 0 for no dropout)
-    # Optional: Layer normalization regularization with learned gain and bias
-    model = FlexibleMLP(depth=3, widths=[50,50,20], input_size=1, output_size=1,
-                        dropout=0.2, layer_norm=False)
-
-    # Main loss function:
-    # For regression:
-    #   nn.MSELoss() <- Mean squared error.
-    #   nn.L1Loss()  <- Mean absolute error, sensitive to outliers
-    #   nn.SmoothL1Loss() <- Huber Loss, sensitive to outliers
-    # For Classification:
-    #   nn.CrossEntropyLoss() <- Combines nn.LogSoftmax() and nn.NLLLoss()
-    #   nn.NLLLoss() <- Negative log likely hood
-    #   nn.BCEWithLogitsLoss() <- Combines a sigmoid layer with binary
-    #                             cross-entropy loss, for binary classification
-    # Other:
-    #   nn.KLDivLoss() <- Kullback-Leibler divergence loss, used for comparing two
-    #                     probability distributions
-    #   Implement your own by subclassing nn.Module
-    criterion = nn.MSELoss()
-
-    # Set optimization algorithm:
-    #   optim.Adam <- Adaptive Learning rate for each parameter. Estimates first and second order
-    #                moment with a weighted average and incorporates a correction for first order
-    #                moment bias
-    #   optim.SGD <- Supports momentum and Nesterov momentum (the latter computes momentum
-    #                after taking a step).
-    #   optim.RMSprop <- Adaptive learning rate for each parameter. Learning rate for a parameter
-    #                    is inversely proportional to an exponentially weighted moving average of
-    #                    historical partial derivatives w.r.t. the parameter.
-    #   optim.Adagrad <- Adaptive learning rate for each parameter. Learning rate for parameter
-    #                    is inversely proportional to the sqrt of the sum of historical squared
-    #                    partial derivatives w.r.t the parameter.
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
-
-    # ------------------------------
-    # Train the Model and Collect Loss Vectors
-    # ------------------------------
-
-    # Train instance of FlexibleMLP
-    # Provide model, main loss function, optimization algorithm, and training data
-    # (Optional) Validation set (required for early stopping regularization)
-    # (Optional) L1 and/or L2 weight decay regularization.
-    # (Optional) Early stopping regularization (set early_stopping_patience = 0 to disable)
-    train_losses, val_losses = train(model, criterion, optimizer, dataloader,
-                                     x_val=x_val, y_val=y_val, epochs=10000,
-                                     l1_reg=0, l2_reg=1e-3, early_stopping_patience=0)
-
-    # ------------------------------
-    # Evaluation and Visualization (Only make this plot if regression task learns a function from R -> R)
-    # ------------------------------
-
-    # Resort data to make smooth plots.
-    x_train_sorted, train_sort_indices = torch.sort(x_train, dim=0)
-    y_train_sorted = y_train[train_sort_indices.squeeze()]
-
-    x_val_sorted, val_sort_indices = torch.sort(x_val, dim=0)
-    y_val_sorted = y_val[val_sort_indices.squeeze()]
-
-    # Pass data through trained network. no_grad() prevents PyTorch from tracking gradients since
-    # this is unnecessary for model evaluation/inference
-    with torch.no_grad():
-        model.eval()  # Set the model to evaluation mode (disables dropout)
-        y_pred_val = model(x_val_sorted).numpy()
-        y_pred_train = model(x_train_sorted).numpy()
-
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x_train_sorted.numpy(), y_train_sorted.numpy(), label='Ground Truth', color='blue')
-    plt.plot(x_train_sorted.numpy(), y_pred_train, label='Model Prediction', color='red', linewidth=2)
-    plt.title('Prediction vs. Ground Truth on Training Set')
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.legend()
-    plt.show()
-
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x_val_sorted.numpy(), y_val_sorted.numpy(), label='Ground Truth', color='blue')
-    plt.plot(x_val_sorted.numpy(), y_pred_val, label='Model Prediction', color='red', linewidth=2)
-    plt.title('Prediction vs. Ground Truth on Validation Set')
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.legend()
-    plt.show()
-
-    # ------------------------------
-    # Plot the Training and Validation Losses
-    # ------------------------------
-    plt.figure(figsize=(10, 5))
-    plt.plot(train_losses, label='Training Loss')
-    if any(val is not None for val in val_losses):
-        plt.plot(val_losses, label='Validation Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Training vs. Validation Loss')
-    plt.legend()
-    plt.show()
 
