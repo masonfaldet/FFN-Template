@@ -9,11 +9,11 @@ from torch.utils.data import DataLoader, random_split
 import Flexible_FFN_Template
 
 # ----------------------------------------------
-# Example Usage: MNIST classification
+# Example Usage: CIFAR 10 classification
 # ----------------------------------------------
-# Details: We use the Flexible FFN Template to classify the MNIST dataset. See the Regression
+# Details: We use the Flexible FFN Template to classify the CIFAR dataset. See the Regression
 # for a more thorough explanation of how to use the Flexible_FFN_Template. Results after training
-# for 20 epochs with various regularization techniques can be found in MNIST_Results folder on repo
+# for 50 epochs with various regularization techniques can be found in MNIST_Results folder on repo
 
 
 def evaluate_and_record_stats(model, test_dataloader, train_losses, val_losses, output_dir, regularization):
