@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 import torchlens as tl
+from tqdm import tqdm
 
 
 # ------------------------------------------------------------------------------
@@ -113,7 +114,7 @@ def train(model, criterion, optimizer, dataloader,
     best_val_loss = float('inf')
     epochs_without_improvement = 0
 
-    for epoch in range(epochs):
+    for epoch in tqdm(range(epochs), desc = "Epochs", unit="epochs"):
         model.train()  # Enable training mode (e.g., for dropout)
         epoch_loss = 0.0
 
