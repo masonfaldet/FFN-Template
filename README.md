@@ -37,3 +37,10 @@ This project requires Python 3.7+ and PyTorch (tested with PyTorch 1.8+). You ca
 
 ```bash
 pip install torch numpy matplotlib
+```
+
+The class `FlexibleMLP` has methods `make_autograd_diagram` and `make_forward_diagram` which allows the user to make computational graphs of their archetecture. See `MNIST_Results folder` for examples of these graphs. To call these methods the user must also download the optional dependices:   
+```bash    
+pip instal torchlens torchviz
+brew install graphviz % On Mac
+
