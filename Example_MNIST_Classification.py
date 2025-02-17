@@ -135,7 +135,9 @@ if __name__ == '__main__':
     test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
 
 
-    model = Flexible_FFN_Template.FlexibleMLP(2, [256, 128], 784, 10,0.0,False)
+    model = Flexible_FFN_Template.FlexibleMLP(2, [256, 128], 784, 10,0.2,True)
+
+    model.make_autograd_diagram('example_MNIST_dropout_norm')
 
     criterion = nn.CrossEntropyLoss()
 
