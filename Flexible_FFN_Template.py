@@ -1,6 +1,9 @@
+import os
+from torchviz import make_dot
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+import torchlens as tl
 
 
 # ------------------------------------------------------------------------------
@@ -21,6 +24,8 @@ class FlexibleMLP(nn.Module):
 
         # Use super to inherit methods from nn.Module
         super(FlexibleMLP, self).__init__()
+
+        self.input_size = input_size
 
         if len(widths) != depth:
             raise ValueError("Length of 'widths' must equal the 'depth' parameter.")
@@ -53,7 +58,31 @@ class FlexibleMLP(nn.Module):
         return self.model(x)
 
 
-# ----------------------------------------------------------------
+    def make_autograd_diagram(self, diagram_name):
+        """
+        (Optional) To run this you must instill graphviz
+        Writes a png containing the autograd computational diagram to the folder ModelGraphs. This helps
+        the user understand the backward pass.
+        :param diagram_name:
+        :return NONE:
+        """
+        dummy_input = torch.randn(1, self.input_size)
+        output = self(dummy_input)
+        dot = make_dot(output, params=dict(self.named_parameters()))
+        os.makedirs("ModelGraphs", exist_ok=True)
+        savename = f"ModelGraphs/{diagram_name}"
+        dot.render(savename, format="png")
+
+    def make_forward_diagram(self):
+        """
+        (Optional function) To run this you must instill graphviz
+        Prints a detailed summary of the forward pass in the command line and displays a graph of the architecture.
+        """
+        dummy_input = torch.randn(1, self.input_size)
+        model_history = tl.log_forward_pass(self, dummy_input, layers_to_save='all',vis_opt='unrolled')
+        print(model_history)
+
+# -----------------------------\-----------------------------------
 # Define a Training Function with Early Stopping and Loss Tracking
 # ----------------------------------------------------------------
 def train(model, criterion, optimizer, dataloader,
