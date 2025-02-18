@@ -13,7 +13,7 @@ import Flexible_FFN_Template
 # ----------------------------------------------
 # Details: We use the Flexible FFN Template to classify the CIFAR dataset. See the Regression
 # for a more thorough explanation of how to use the Flexible_FFN_Template. Results after training
-# for 50 epochs with various regularization techniques can be found in MNIST_Results folder on repo
+# for 75 epochs with various regularization techniques can be found in MNIST_Results folder on repo
 
 
 def evaluate_and_record_stats(model, test_dataloader, train_losses, val_losses, output_dir, regularization):
@@ -135,18 +135,19 @@ if __name__ == '__main__':
 
     # Instantiate the model.
     # For CIFAR-10, the input vector size is 3*32*32 = 3072, and there are 10 classes.
-    model = Flexible_FFN_Template.FlexibleMLP(depth=2, widths=[1024, 512], input_size= 3072,
-                                              output_size= 10, dropout=0.1, layer_norm=True)
+    model = Flexible_FFN_Template.FlexibleMLP(depth=3, widths=[1024, 512, 256], input_size= 3072,
+                                              output_size= 10, dropout=0.2, batch_norm=True)
 
     criterion = nn.CrossEntropyLoss()
+
     optimizer = optim.Adam(model.parameters(), 0.01)
 
     train_losses, val_losses = Flexible_FFN_Template.train(
         model, criterion, optimizer, train_loader, val_loader,
-        epochs=50, l1_reg=0, l2_reg=1e-3, early_stopping_patience=0
+        epochs=75, l1_reg=0, l2_reg=0, early_stopping_patience=0
     )
 
     output_folder = 'CIFAR10_Results'
-    regularization = 'Dropout_Norm_L2_Decay'
+    regularization = 'Dropout_Batch_Norm'
     os.makedirs(output_folder, exist_ok=True)
     evaluate_and_record_stats(model, test_loader, train_losses, val_losses, output_folder, regularization)

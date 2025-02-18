@@ -11,7 +11,7 @@ from tqdm import tqdm
 # Define a Flexible Feedforward Neural Network with Optional Layer Normalization
 # ------------------------------------------------------------------------------
 class FlexibleMLP(nn.Module):
-    def __init__(self, depth, widths, input_size=1, output_size=1, dropout=0.0, layer_norm=False):
+    def __init__(self, depth, widths, input_size=1, output_size=1, dropout=0.0, batch_norm = False,layer_norm=False):
         """
         Parameters:
             depth (int): Number of hidden layers.
@@ -21,6 +21,7 @@ class FlexibleMLP(nn.Module):
             output_size (int): Dimensionality of the output.
             dropout (float): Dropout probability (if > 0, dropout layers are added after activations).
             layer_norm (bool): If True, adds Layer Normalization after each linear layer (before activation).
+            batch_norm (bool): If True, adds BatchNorm after each linear layer (before activation).
         """
 
         # Use super to inherit methods from nn.Module
@@ -37,6 +38,8 @@ class FlexibleMLP(nn.Module):
         layers.append(nn.Linear(input_size, widths[0]))
         if layer_norm:
             layers.append(nn.LayerNorm(widths[0]))
+        if batch_norm:
+            layers.append(nn.BatchNorm1d(widths[0]))
         layers.append(nn.ReLU())
         if dropout > 0:
             layers.append(nn.Dropout(dropout))
@@ -46,6 +49,8 @@ class FlexibleMLP(nn.Module):
             layers.append(nn.Linear(widths[i - 1], widths[i]))
             if layer_norm:
                 layers.append(nn.LayerNorm(widths[i]))
+            if batch_norm:
+                layers.append(nn.BatchNorm1d(widths[i]))
             layers.append(nn.ReLU())
             if dropout > 0:
                 layers.append(nn.Dropout(dropout))
