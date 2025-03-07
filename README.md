@@ -1,6 +1,6 @@
 # FFN Template with Regularization Options
 
-This repository contains an annotated template for a feed-forward neural network (FFN) implemented in PyTorch. The goal of this project is to introduce fundamental PyTorch syntax and functionality to beginners. The template allows users to easily toggle various regularization techniques for comparison, including dropout, layer and batch normalization, L1/L2 weight decay, and early stopping.
+This repository contains an annotated template for a simple MLP feed-forward neural network (FFN) implemented in PyTorch. The goal of this project is to introduce fundamental PyTorch syntax and functionality to beginners. The template allows users to easily toggle various regularization techniques for comparison, including dropout, layer and batch normalization, L1/L2 weight decay, and early stopping.
 
 In its current configuration, the model is set up for regression tasks (e.g., learning the sine function). However, you can readily modify the output activation (for example, by adding a softmax unit) or simply use `torch.nn.CrossEntropyLoss()` to tackle classification tasks. Additionally, you can extend the architecture by adding convolution or residual layers if desired.
 
